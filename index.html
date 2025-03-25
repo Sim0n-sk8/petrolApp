@@ -108,6 +108,7 @@
             padding: 15px;
             background-color: #2c3e50;
             border-radius: 6px;
+            font-size: 1.5rem;
         }
 
         #history {
@@ -131,16 +132,7 @@
             background-color: #2c3e50;
             border-radius: 6px;
             color: #4a6cf7;
-        }
-
-        .calculation-details {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #8a9099;
-            text-align: left;
-            padding: 10px;
-            background-color: #2c3e50;
-            border-radius: 6px;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -162,7 +154,6 @@
         <button class="btn btn-calculate" onclick="calculatePetrolCost()">Calculate Cost</button>
 
         <div id="result"></div>
-        <div id="calculationDetails" class="calculation-details"></div>
 
         <div id="history">
             <h2>Trip History</h2>
@@ -221,17 +212,15 @@
             const distance = parseFloat(document.getElementById('distance').value);
             const petrolPrice = parseFloat(document.getElementById('petrolPrice').value);
             const resultElement = document.getElementById('result');
-            const detailsElement = document.getElementById('calculationDetails');
 
             if (isNaN(distance) || isNaN(petrolPrice) || distance <= 0 || petrolPrice <= 0) {
                 resultElement.textContent = 'Please enter valid distance and price';
                 resultElement.style.color = '#d32f2f';
-                detailsElement.textContent = '';
                 return;
             }
 
             const litersUsed = distance / CONSUMPTION_RATE;
-            const totalCost = litersUsed * petrolPrice;
+            const totalCost = Math.ceil(litersUsed * petrolPrice); // Round up to nearest whole number
 
             const trip = {
                 date: new Date().toLocaleDateString(),
@@ -243,18 +232,8 @@
             trips.push(trip);
             StorageManager.saveTrips(trips);
 
-            resultElement.textContent = `Total Cost: R${totalCost.toFixed(2)}`;
+            resultElement.textContent = `Amount Owed: R${totalCost}`;
             resultElement.style.color = '#4a6cf7';
-
-            // Show calculation details
-            detailsElement.innerHTML = `
-                Calculation Details:<br>
-                Distance: ${distance} km<br>
-                Consumption Rate: ${CONSUMPTION_RATE.toFixed(2)} km/L<br>
-                Liters Used: ${litersUsed.toFixed(2)} L<br>
-                Petrol Price: R${petrolPrice.toFixed(2)}/L<br>
-                Total Cost: ${distance}km ÷ ${CONSUMPTION_RATE.toFixed(2)}km/L × R${petrolPrice.toFixed(2)}/L = R${totalCost.toFixed(2)}
-            `;
 
             renderHistory();
 
@@ -278,12 +257,12 @@
                         ${trip.date}<br>
                         ${trip.distance} km @ R${trip.petrolPrice}/L
                     </div>
-                    <div>R${trip.totalCost.toFixed(2)}</div>
+                    <div>R${trip.totalCost}</div>
                 `;
                 tripsElement.appendChild(tripElement);
             });
 
-            totalElement.textContent = `Total Spent: R${totalSpend.toFixed(2)}`;
+            totalElement.textContent = `Total Spent: R${totalSpend}`;
         }
 
         function clearHistory() {
